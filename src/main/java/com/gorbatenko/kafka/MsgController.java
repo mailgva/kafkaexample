@@ -10,8 +10,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("msg")
 public class MsgController {
 
+    private final KafkaTemplate kafkaTemplate;
+
     @Autowired
-    private KafkaTemplate<Long, String> kafkaTemplate;
+    public MsgController(KafkaTemplate kafkaTemplate) {
+        this.kafkaTemplate = kafkaTemplate;
+    }
 
     @PostMapping
     public void sendOrder(Long msgId, String msg){
