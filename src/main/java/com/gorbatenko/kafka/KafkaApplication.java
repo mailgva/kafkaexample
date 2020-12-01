@@ -10,28 +10,35 @@ import org.springframework.kafka.core.KafkaTemplate;
 @EnableKafka
 @SpringBootApplication
 public class KafkaApplication {
+    // For test you need in Postman send POST-request or GET-request on url
+    // http://localhost:8080/msg
+    // params
+    // msg=Some text
 
-    private static KafkaTemplate<Long, String> kafkaTemplate;
+    private static KafkaTemplate<String, User> kafkaTemplateUser;
 
-    @KafkaListener(topics="msg")
-    public void msgListener(String msg){
-        System.out.println("message = " + msg);
+    private static KafkaTemplate<String, String> kafkaTemplateStr;
+
+    @KafkaListener(topics="str")
+    public void msgListener(String str){
+        System.out.println(str);
+    }
+
+    @KafkaListener(topics="msg", containerFactory="userKafkaListenerContainerFactory")
+    public void msgListener(User user){
+        System.out.println(user);
     }
 
     public static void main(String[] args) {
         ApplicationContext ctx = SpringApplication.run(KafkaApplication.class, args);
-        kafkaTemplate = ctx.getBean(KafkaTemplate.class);
+        kafkaTemplateUser = ctx.getBean(KafkaTemplate.class);
+        kafkaTemplateStr = ctx.getBean(KafkaTemplate.class);
         sendStart();
     }
 
     private static void sendStart() {
-        kafkaTemplate.send("msg", 1L, "Consumer is ready");
+        kafkaTemplateUser.send("msg", new User("TestName", 25, "Hello from start app"));
+        kafkaTemplateStr.send("str", "Hello from start app with STR");
     }
-
-    // For test you need in postman send post request on url
-    // http://localhost:8080/msg
-    // params
-    // msgId=1
-    // msg=Some text
 
 }
